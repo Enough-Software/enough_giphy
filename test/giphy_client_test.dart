@@ -1,5 +1,4 @@
 import 'package:enough_giphy/enough_giphy.dart';
-import 'package:matcher/matcher.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'fake.dart';
 
