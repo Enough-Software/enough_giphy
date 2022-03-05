@@ -1,9 +1,13 @@
+// ignore_for_file: avoid_print
+
 import 'package:enough_giphy/enough_giphy.dart';
 
-main(List<String> args) async {
+/// Entry point for example app
+// ignore: avoid_void_async
+void main(List<String> args) async {
   if (args.isEmpty) {
     print('Usage: dart example/enough_giphy_example.dart GIPHY_API_KEY');
-    return -1;
+    return;
   }
   final apiKey = args.first;
   final client = GiphyClient(apiKey: apiKey);
@@ -21,13 +25,12 @@ main(List<String> args) async {
     lang: GiphyLanguage.english,
   );
   final firstSticker = await stickers.load(0);
-  print(
-      'first sticker preview URL: ${firstSticker.recommendedMobileKeyboard.url}');
+  print('sticker preview URL: ${firstSticker.recommendedMobileKeyboard.url}');
 
   // Retrieve emoji:
   final emojis = await client.emojis();
   final secondEmoji = await emojis.load(1);
-  print('got emoji preview URL: ${secondEmoji.recommendedMobileKeyboard.url}');
+  print('emoji preview URL: ${secondEmoji.recommendedMobileKeyboard.url}');
 
   // Search for cat GIFs:
   final catSearch = await client.search('cat');

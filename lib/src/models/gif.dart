@@ -1,35 +1,128 @@
+import 'dart:convert';
+
 import 'image.dart';
 import 'images.dart';
 import 'rating.dart';
 import 'user.dart';
 
+/// A giphy gif, sticker or emoji
 class GiphyGif {
-  String title;
-  String type;
-  String id;
-  String slug;
-  String url;
-  String? bitlyGifUrl;
-  String bitlyUrl;
-  String? embedUrl;
-  String? username;
-  String? source;
-  GiphyRating? rating;
-  String? contentUrl;
-  String? sourceTld;
-  String? sourcePostUrl;
-  // int? isSticker;
-  DateTime? importDatetime;
-  DateTime? trendingDatetime;
-  GiphyUser? user;
+  /// Creates a new GIF instance
+  const GiphyGif({
+    required this.title,
+    required this.type,
+    required this.id,
+    required this.slug,
+    required this.url,
+    required this.bitlyUrl,
+    required this.images,
+    this.embedUrl,
+    this.username,
+    this.source,
+    this.rating,
+    this.contentUrl,
+    this.sourceTld,
+    this.sourcePostUrl,
+    this.createDateTime,
+    this.importDateTime,
+    this.trendingDateTime,
+    this.user,
+  });
+
+  /// Creates a new GIF instance from [json]
+  factory GiphyGif.fromJson(Map<String, dynamic> json) => GiphyGif(
+        title: json['title'],
+        type: json['type'],
+        id: json['id'],
+        slug: json['slug'],
+        url: json['url'],
+        bitlyUrl: json['bitly_url'] ?? json['bitly_gif_url'],
+        embedUrl: json['embed_url'],
+        username: json['username'],
+        source: json['source'],
+        rating: _toRating(json['rating']),
+        contentUrl: json['content_url'],
+        sourceTld: json['source_tld'],
+        sourcePostUrl: json['source_post_url'],
+        createDateTime: json['create_datetime'] == null
+            ? null
+            : DateTime.parse(json['create_datetime']),
+        importDateTime: json['import_datetime'] == null
+            ? null
+            : DateTime.parse(json['import_datetime']),
+        trendingDateTime: json['trending_datetime'] == null
+            ? null
+            : DateTime.parse(json['trending_datetime']),
+        user: json['user'] == null ? null : GiphyUser.fromJson(json['user']),
+        images: GiphyImages.fromJson(json['images']),
+      );
+
+  /// The title that appears on giphy.com for this GIF.
+  final String title;
+
+  /// The type of the gif
+  ///
+  /// By default, this is almost always GIF.
+  final String type;
+
+  /// The unique ID of the gif
+  final String id;
+
+  /// The unique slug used in this GIF's URL
+  final String slug;
+
+  /// The unique URL for this GIF
+  final String url;
+
+  /// The unique bit.ly URL for this GIF
+  final String bitlyUrl;
+
+  /// A URL used for embedding this GIF
+  final String? embedUrl;
+
+  /// The username this GIF is attached to, if applicable
+  final String? username;
+
+  /// The page on which this GIF was found
+  final String? source;
+
+  /// The MPAA-style rating for this content.
+  /// Examples include Y, G, PG, PG-13 and R
+  final GiphyRating? rating;
+
+  /// Currently unused
+  final String? contentUrl;
+
+  /// The top level domain of the source URL.
+  final String? sourceTld;
+
+  /// The URL of the webpage on which this GIF was found.
+  final String? sourcePostUrl;
+
+  /// The date this GIF was added to the GIPHY database.
+  final DateTime? createDateTime;
+
+  /// The creation or upload date from this GIF's source.
+  final DateTime? importDateTime;
+
+  /// The date on which this gif was marked trending, if applicable.
+  final DateTime? trendingDateTime;
+
+  /// An object containing data about the user associated with this GIF,
+  /// if applicable.
+  final GiphyUser? user;
 
   /// Contains the available image data formats of this gif
   ///
-  /// Compare [recommendedMobileKeyboard] for a recommendation for a GIF picker scenario
-  /// Compare [recommendedMobileSend] for a recommendation for a mobile send/share scenario
-  GiphyImages images;
+  /// Compare [recommendedMobileKeyboard] for a recommendation
+  /// for a GIF picker scenario.
+  ///
+  /// Compare [recommendedMobileSend] for a recommendation for a
+  /// mobile send/share scenario.
+  final GiphyImages images;
 
-  /// Retrieves the recommended image for using this GIF in a small picker scenario
+  /// Retrieves the recommended image for using this GIF
+  /// in a small picker scenario
   GiphyImage get recommendedMobileKeyboard =>
       images.fixedHeightSmall ??
       images.fixedWidthSmall ??
@@ -37,81 +130,35 @@ class GiphyGif {
       images.previewWebp ??
       images.fixedWidth;
 
-  /// Retrieves the recommended image sending / sharing this GIF in a mobile scenario
+  /// Retrieves the recommended image sending / sharing this GIF
+  /// in a mobile scenario
   GiphyImage get recommendedMobileSend =>
       images.downsizedLarge ?? images.original ?? images.fixedWidth;
 
-  GiphyGif({
-    required this.title,
-    required this.type,
-    required this.id,
-    required this.slug,
-    required this.url,
-    required this.bitlyGifUrl,
-    required this.bitlyUrl,
-    required this.embedUrl,
-    required this.username,
-    required this.source,
-    required this.rating,
-    required this.contentUrl,
-    required this.sourceTld,
-    required this.sourcePostUrl,
-    // required this.isSticker,
-    required this.importDatetime,
-    required this.trendingDatetime,
-    required this.user,
-    required this.images,
-  });
-
-  factory GiphyGif.fromJson(Map<String, dynamic> json) => GiphyGif(
-      title: json['title'],
-      type: json['type'],
-      id: json['id'],
-      slug: json['slug'],
-      url: json['url'],
-      bitlyGifUrl: json['bitly_gif_url'],
-      bitlyUrl: json['bitly_url'],
-      embedUrl: json['embed_url'],
-      username: json['username'],
-      source: json['source'],
-      rating: _toRating(json['rating']),
-      contentUrl: json['content_url'],
-      sourceTld: json['source_tld'],
-      sourcePostUrl: json['source_post_url'],
-      // isSticker: json['is_sticker'] as int,
-      importDatetime: DateTime.parse(json['import_datetime']),
-      trendingDatetime: DateTime.parse(json['trending_datetime']),
-      user: GiphyUser.fromJson(json['user'] as Map<String, dynamic>?),
-      images: GiphyImages.fromJson(json['images'] as Map<String, dynamic>));
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'title': title,
-      'type': type,
-      'id': id,
-      'slug': slug,
-      'url': url,
-      'bitly_gif_url': bitlyGifUrl,
-      'bitly_url': bitlyUrl,
-      'embed_url': embedUrl,
-      'username': username,
-      'source': source,
-      'rating': rating?.name,
-      'content_url': contentUrl,
-      'source_tld': sourceTld,
-      'source_post_url': sourcePostUrl,
-      // 'is_sticker': isSticker,
-      'import_datetime': importDatetime?.toIso8601String(),
-      'trending_datetime': trendingDatetime?.toIso8601String(),
-      'user': user?.toJson(),
-      'images': images.toJson()
-    };
-  }
+  /// Converts this GIPHY to JSON
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'title': title,
+        'type': type,
+        'id': id,
+        'slug': slug,
+        'url': url,
+        'bitly_url': bitlyUrl,
+        'embed_url': embedUrl,
+        'username': username,
+        'source': source,
+        'rating': rating?.name,
+        'content_url': contentUrl,
+        'source_tld': sourceTld,
+        'source_post_url': sourcePostUrl,
+        'create_datetime': createDateTime?.toIso8601String(),
+        'import_datetime': importDateTime?.toIso8601String(),
+        'trending_datetime': trendingDateTime?.toIso8601String(),
+        'user': user?.toJson(),
+        'images': images.toJson()
+      };
 
   @override
-  String toString() {
-    return 'GiphyGif{title: $title, type: $type, id: $id, slug: $slug, url: $url, bitlyGifUrl: $bitlyGifUrl, bitlyUrl: $bitlyUrl, embedUrl: $embedUrl, username: $username, source: $source, rating: $rating, contentUrl: $contentUrl, sourceTld: $sourceTld, sourcePostUrl: $sourcePostUrl,  importDatetime: $importDatetime, trendingDatetime: $trendingDatetime, user: $user, images: $images}';
-  }
+  String toString() => jsonEncode(toJson());
 
   @override
   bool operator ==(Object other) =>
@@ -123,7 +170,6 @@ class GiphyGif {
           id == other.id &&
           slug == other.slug &&
           url == other.url &&
-          bitlyGifUrl == other.bitlyGifUrl &&
           bitlyUrl == other.bitlyUrl &&
           embedUrl == other.embedUrl &&
           username == other.username &&
@@ -132,9 +178,9 @@ class GiphyGif {
           contentUrl == other.contentUrl &&
           sourceTld == other.sourceTld &&
           sourcePostUrl == other.sourcePostUrl &&
-          // isSticker == other.isSticker &&
-          importDatetime == other.importDatetime &&
-          trendingDatetime == other.trendingDatetime &&
+          createDateTime == other.createDateTime &&
+          importDateTime == other.importDateTime &&
+          trendingDateTime == other.trendingDateTime &&
           user == other.user &&
           images == other.images;
 
@@ -145,7 +191,6 @@ class GiphyGif {
       id.hashCode ^
       slug.hashCode ^
       url.hashCode ^
-      bitlyGifUrl.hashCode ^
       bitlyUrl.hashCode ^
       embedUrl.hashCode ^
       username.hashCode ^
@@ -154,13 +199,13 @@ class GiphyGif {
       contentUrl.hashCode ^
       sourceTld.hashCode ^
       sourcePostUrl.hashCode ^
-      // isSticker.hashCode ^
-      importDatetime.hashCode ^
-      trendingDatetime.hashCode ^
+      createDateTime.hashCode ^
+      importDateTime.hashCode ^
+      trendingDateTime.hashCode ^
       user.hashCode ^
       images.hashCode;
 
-  static GiphyRating? _toRating(dynamic value) {
+  static GiphyRating? _toRating(String? value) {
     if (value == null) {
       return null;
     }

@@ -1,6 +1,7 @@
-/// Provides the supported langage codes for regional content of GIPHY
+/// Provides the supported language codes for regional content of GIPHY
 ///
-/// You can pass any supported 2-letter language code, compare  https://developers.giphy.com/docs/optional-settings/#language-support
+/// You can pass any supported 2-letter language code,
+/// compare  https://developers.giphy.com/docs/optional-settings/#language-support
 class GiphyLanguage {
   GiphyLanguage._();
 

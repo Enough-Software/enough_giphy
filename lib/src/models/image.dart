@@ -1,7 +1,9 @@
-/// Base class for immages
+import 'dart:convert';
+
+/// Base class for images
 class GiphyImage {
   /// Creates a new image
-  GiphyImage(this.url, this.width, this.height, this.size);
+  const GiphyImage(this.url, this.width, this.height, this.size);
 
   /// The download URL of this image data
   final String url;
@@ -29,10 +31,59 @@ class GiphyImage {
 
   /// The size of this image data in bytes, e.g. `62923`
   int get sizeInt => int.parse(size);
+
+  /// Converts this image to JSON
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'url': url,
+        'width': width,
+        'height': height,
+        'size': size,
+      };
+
+  @override
+  String toString() => jsonEncode(toJson());
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GiphyImage &&
+          runtimeType == other.runtimeType &&
+          url == other.url &&
+          width == other.width &&
+          height == other.height &&
+          size == other.size;
+
+  @override
+  int get hashCode =>
+      url.hashCode ^ width.hashCode ^ height.hashCode ^ size.hashCode;
 }
 
 /// A full image description
 class GiphyFullImage extends GiphyImage {
+  /// Creates a new full image
+  const GiphyFullImage({
+    required String url,
+    required String width,
+    required String height,
+    required String size,
+    this.mp4,
+    this.mp4Size,
+    this.webp,
+    this.webpSize,
+  }) : super(url, width, height, size);
+
+  /// Creates a new full image from [json]
+  factory GiphyFullImage.fromJson(Map<String, dynamic> json) => GiphyFullImage(
+        url: json['url'],
+        width: json['width'],
+        height: json['height'],
+        size: json['size'],
+        mp4: json['mp4'],
+        mp4Size: json['mp4_size'],
+        webp: json['webp'],
+        webpSize: json['webp_size'],
+      );
+
   /// Optional URL of the MP4 data
   final String? mp4;
 
@@ -45,44 +96,15 @@ class GiphyFullImage extends GiphyImage {
   /// Optional size of the WEBP data in bytes
   final String? webpSize;
 
-  GiphyFullImage({
-    required String url,
-    required String width,
-    required String height,
-    required String size,
-    this.mp4,
-    this.mp4Size,
-    this.webp,
-    this.webpSize,
-  }) : super(url, width, height, size);
-
-  factory GiphyFullImage.fromJson(Map<String, dynamic> json) => GiphyFullImage(
-      url: json['url'],
-      width: json['width'],
-      height: json['height'],
-      size: json['size'],
-      mp4: json['mp4'],
-      mp4Size: json['mp4_size'],
-      webp: json['webp'],
-      webpSize: json['webp_size']);
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'url': url,
-      'width': width,
-      'height': height,
-      'size': size,
-      'mp4': mp4,
-      'mp4_size': mp4Size,
-      'webp': webp,
-      'webp_size': webpSize
-    };
-  }
+  @override
+  Map<String, dynamic> toJson() => super.toJson()
+    ..['mp4'] = mp4
+    ..['mp4_size'] = mp4Size
+    ..['webp'] = webp
+    ..['webp_size'] = webpSize;
 
   @override
-  String toString() {
-    return 'GiphyFullImage{url: $url, width: $width, height: $height, size: $size, mp4: $mp4, mp4Size: $mp4Size, webp: $webp, webpSize: $webpSize}';
-  }
+  String toString() => jsonEncode(toJson());
 
   @override
   bool operator ==(Object other) =>
@@ -100,18 +122,44 @@ class GiphyFullImage extends GiphyImage {
 
   @override
   int get hashCode =>
-      url.hashCode ^
-      width.hashCode ^
-      height.hashCode ^
-      size.hashCode ^
-      mp4.hashCode ^
-      mp4Size.hashCode ^
-      webp.hashCode ^
-      webpSize.hashCode;
+      super.hashCode ^
+      (mp4?.hashCode ?? 0) ^
+      (mp4Size?.hashCode ?? 0) ^
+      (webp?.hashCode ?? 0) ^
+      (webpSize?.hashCode ?? 0);
 }
 
 /// The description of an original image
 class GiphyOriginalImage extends GiphyImage {
+  /// Creates a new original image
+  const GiphyOriginalImage({
+    required String url,
+    required String width,
+    required String height,
+    required String size,
+    required this.frames,
+    required this.mp4,
+    required this.mp4Size,
+    this.webp,
+    this.webpSize,
+    this.hash,
+  }) : super(url, width, height, size);
+
+  /// Creates a new original image from [json]
+  factory GiphyOriginalImage.fromJson(Map<String, dynamic> json) =>
+      GiphyOriginalImage(
+        url: json['url'],
+        width: json['width'],
+        height: json['height'],
+        size: json['size'],
+        frames: json['frames'],
+        mp4: json['mp4'],
+        mp4Size: json['mp4_size'],
+        webp: json['webp'],
+        webpSize: json['webp_size'],
+        hash: json['hash'],
+      );
+
   /// The number of frames in this GIF.
   final String frames;
 
@@ -136,57 +184,17 @@ class GiphyOriginalImage extends GiphyImage {
   /// The size in bytes of the .webp file corresponding to this GIF.
   int? get webpSizeInt => webpSize == null ? null : int.parse(webpSize!);
 
-  /// The hash of the image, not offically supported
-  final String hash;
-
-  /// Creates a new original image
-  GiphyOriginalImage({
-    required String url,
-    required String width,
-    required String height,
-    required String size,
-    required this.frames,
-    required this.mp4,
-    required this.mp4Size,
-    this.webp,
-    this.webpSize,
-    required this.hash,
-  }) : super(url, width, height, size);
-
-  factory GiphyOriginalImage.fromJson(Map<String, dynamic> json) {
-    return GiphyOriginalImage(
-      url: json['url'],
-      width: json['width'],
-      height: json['height'],
-      size: json['size'],
-      frames: json['frames'],
-      mp4: json['mp4'],
-      mp4Size: json['mp4_size'],
-      webp: json['webp'],
-      webpSize: json['webp_size'],
-      hash: json['hash'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'url': url,
-      'width': width,
-      'height': height,
-      'size': size,
-      'frames': frames,
-      'mp4': mp4,
-      'mp4_size': mp4Size,
-      'webp': webp,
-      'webp_size': webpSize,
-      'hash': hash
-    };
-  }
+  /// The hash of the image, not officially supported
+  final String? hash;
 
   @override
-  String toString() {
-    return 'GiphyOriginalImage{url: $url, width: $width, height: $height, size: $size, frames: $frames, mp4: $mp4, mp4Size: $mp4Size, webp: $webp, webpSize: $webpSize, hash: $hash}';
-  }
+  Map<String, dynamic> toJson() => super.toJson()
+    ..['frames'] = frames
+    ..['mp4'] = mp4
+    ..['mp4_size'] = mp4Size
+    ..['webp'] = webp
+    ..['webp_size'] = webpSize
+    ..['hash'] = hash;
 
   @override
   bool operator ==(Object other) =>
@@ -215,55 +223,50 @@ class GiphyOriginalImage extends GiphyImage {
       mp4Size.hashCode ^
       webp.hashCode ^
       webpSize.hashCode ^
-      hash.hashCode;
+      (hash?.hashCode ?? 0);
 }
 
+/// A still image (without animation)
 class GiphyStillImage extends GiphyImage {
-  GiphyStillImage({
+  /// Creates a new still image
+  const GiphyStillImage({
     required String url,
     required String width,
     required String height,
     required String size,
   }) : super(url, width, height, size);
 
+  /// Creates a new still image from [json]
   factory GiphyStillImage.fromJson(Map<String, dynamic> json) =>
       GiphyStillImage(
           url: json['url'],
           width: json['width'],
           height: json['height'],
           size: json['size'] ?? '');
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'url': url,
-      'width': width,
-      'height': height,
-      'size': size
-    };
-  }
-
-  @override
-  String toString() {
-    return 'GiphyStillImage{url: $url, width: $width, height: $height, size: $size}';
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GiphyStillImage &&
-          runtimeType == other.runtimeType &&
-          url == other.url &&
-          width == other.width &&
-          height == other.height &&
-          size == other.size;
-
-  @override
-  int get hashCode =>
-      url.hashCode ^ width.hashCode ^ height.hashCode ^ size.hashCode;
 }
 
-/// A downsampled image
-class GiphyDownsampledImage extends GiphyImage {
+/// A down-sampled image
+class GiphyDownSampledImage extends GiphyImage {
+  /// Creates a new down-sampled image
+  GiphyDownSampledImage({
+    required String url,
+    required String width,
+    required String height,
+    required String size,
+    this.webp,
+    this.webpSize,
+  }) : super(url, width, height, size);
+
+  /// Creates a new down-sampled image from [json]
+  factory GiphyDownSampledImage.fromJson(Map<String, dynamic> json) =>
+      GiphyDownSampledImage(
+          url: json['url'],
+          width: json['width'],
+          height: json['height'],
+          size: json['size'],
+          webp: json['webp'],
+          webpSize: json['webp_size']);
+
   /// The URL for this GIF in .webp format.
   final String? webp;
 
@@ -273,46 +276,15 @@ class GiphyDownsampledImage extends GiphyImage {
   /// The size in bytes of the .webp file corresponding to this GIF.
   int? get webpSizeInt => webpSize == null ? null : int.parse(webpSize!);
 
-  /// Creates a new downsampled image
-  GiphyDownsampledImage({
-    required String url,
-    required String width,
-    required String height,
-    required String size,
-    this.webp,
-    this.webpSize,
-  }) : super(url, width, height, size);
-
-  factory GiphyDownsampledImage.fromJson(Map<String, dynamic> json) {
-    return GiphyDownsampledImage(
-        url: json['url'],
-        width: json['width'],
-        height: json['height'],
-        size: json['size'],
-        webp: json['webp'],
-        webpSize: json['webp_size']);
-  }
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'url': url,
-      'width': width,
-      'height': height,
-      'size': size,
-      'webp': webp,
-      'webp_size': webpSize
-    };
-  }
-
   @override
-  String toString() {
-    return 'GiphyDownsampledImage{url: $url, width: $width, height: $height, size: $size, webp: $webp, webpSize: $webpSize}';
-  }
+  Map<String, dynamic> toJson() => super.toJson()
+    ..['webp'] = webp
+    ..['webp_size'] = webpSize;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GiphyDownsampledImage &&
+      other is GiphyDownSampledImage &&
           runtimeType == other.runtimeType &&
           url == other.url &&
           width == other.width &&
@@ -323,16 +295,21 @@ class GiphyDownsampledImage extends GiphyImage {
 
   @override
   int get hashCode =>
-      url.hashCode ^
-      width.hashCode ^
-      height.hashCode ^
-      size.hashCode ^
-      webp.hashCode ^
-      webpSize.hashCode;
+      super.hashCode ^ webp.hashCode ^ (webpSize?.hashCode ?? 0);
 }
 
 /// Data on the 15 second version of the GIF looping.
 class GiphyLoopingImage {
+  /// Creates a new looping image
+  const GiphyLoopingImage({
+    required this.mp4,
+    this.mp4Size,
+  });
+
+  /// Creates a new looping image from [json]
+  factory GiphyLoopingImage.fromJson(Map<String, dynamic> json) =>
+      GiphyLoopingImage(mp4: json['mp4'], mp4Size: json['mp4_size']);
+
   /// The URL for this GIF in .MP4 format.
   final String mp4;
 
@@ -342,22 +319,12 @@ class GiphyLoopingImage {
   /// The size of this file in bytes.
   int? get mp4SizeInt => mp4Size == null ? null : int.parse(mp4Size!);
 
-  /// Creates a new looping image
-  GiphyLoopingImage({
-    required this.mp4,
-    this.mp4Size,
-  });
-
-  factory GiphyLoopingImage.fromJson(Map<String, dynamic> json) =>
-      GiphyLoopingImage(mp4: json['mp4'], mp4Size: json['mp4_size']);
-
+  /// Converts this image to JSON
   Map<String, dynamic> toJson() =>
       <String, dynamic>{'mp4': mp4, 'mp4_size': mp4Size};
 
   @override
-  String toString() {
-    return 'GiphyLoopingImage{mp4: $mp4, mp4Size: $mp4Size}';
-  }
+  String toString() => jsonEncode(toJson());
 
   @override
   bool operator ==(Object other) =>
@@ -368,47 +335,45 @@ class GiphyLoopingImage {
           mp4Size == other.mp4Size;
 
   @override
-  int get hashCode => mp4.hashCode ^ mp4Size.hashCode;
+  int get hashCode => mp4.hashCode ^ (mp4Size?.hashCode ?? 0);
 }
 
-/// Data on a version of this GIF in .MP4 format limited to 50kb that displays the first 1-2 seconds of the GIF.
+/// Data on a version of this GIF in .MP4 format limited to 50kb
+/// that displays the first 1-2 seconds of the GIF.
 class GiphyPreviewImage extends GiphyImage {
-  /// The URL for this GIF in .MP4 format.
-  final String mp4;
-
-  /// The size of this file in bytes.
-  final String mp4Size;
-
   /// Creates a new preview image
-  GiphyPreviewImage({
+  const GiphyPreviewImage({
     required String width,
     required String height,
     required this.mp4,
     required this.mp4Size,
   }) : super(mp4, width, height, mp4Size);
 
-  factory GiphyPreviewImage.fromJson(Map<String, dynamic> json) {
-    return GiphyPreviewImage(
-      width: json['width'],
-      height: json['height'],
-      mp4: json['mp4'] ?? '',
-      mp4Size: json['mp4_size'] ?? '',
-    );
-  }
+  /// Creates a new preview image from [json]
+  factory GiphyPreviewImage.fromJson(Map<String, dynamic> json) =>
+      GiphyPreviewImage(
+        width: json['width'],
+        height: json['height'],
+        mp4: json['mp4'] ?? '',
+        mp4Size: json['mp4_size'] ?? '',
+      );
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'width': width,
-      'height': height,
-      'mp4': mp4,
-      'mp4_size': mp4Size
-    };
-  }
+  /// The URL for this GIF in .MP4 format.
+  final String mp4;
+
+  /// The size of this file in bytes.
+  final String mp4Size;
 
   @override
-  String toString() {
-    return 'GiphyPreviewImage{width: $width, height: $height, mp4: $mp4, mp4Size: $mp4Size}';
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'width': width,
+        'height': height,
+        'mp4': mp4,
+        'mp4_size': mp4Size
+      };
+
+  @override
+  String toString() => jsonEncode(toJson());
 
   @override
   bool operator ==(Object other) =>
@@ -426,51 +391,23 @@ class GiphyPreviewImage extends GiphyImage {
 }
 
 /// Data on a version of this GIF downsized.
-class GiphyDownsizedImage extends GiphyImage {
-  /// Creates a new downsizedimage
-  GiphyDownsizedImage({
+class GiphyDownSizedImage extends GiphyImage {
+  /// Creates a new down-sized image
+  GiphyDownSizedImage({
     required String url,
     required String width,
     required String height,
     required String size,
   }) : super(url, width, height, size);
 
-  factory GiphyDownsizedImage.fromJson(Map<String, dynamic> json) {
-    return GiphyDownsizedImage(
-      url: json['url'],
-      width: json['width'],
-      height: json['height'],
-      size: json['size'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'url': url,
-      'width': width,
-      'height': height,
-      'size': size
-    };
-  }
-
-  @override
-  String toString() {
-    return 'GiphyDownsizedImage{url: $url, width: $width, height: $height, size: $size}';
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GiphyDownsizedImage &&
-          runtimeType == other.runtimeType &&
-          url == other.url &&
-          width == other.width &&
-          height == other.height &&
-          size == other.size;
-
-  @override
-  int get hashCode =>
-      url.hashCode ^ width.hashCode ^ height.hashCode ^ size.hashCode;
+  /// Creates a new down-sized image from [json]
+  factory GiphyDownSizedImage.fromJson(Map<String, dynamic> json) =>
+      GiphyDownSizedImage(
+        url: json['url'],
+        width: json['width'],
+        height: json['height'],
+        size: json['size'],
+      );
 }
 
 /// A GIF image in .WEBP format
@@ -483,40 +420,11 @@ class GiphyWebPImage extends GiphyImage {
     required String size,
   }) : super(url, width, height, size);
 
-  factory GiphyWebPImage.fromJson(Map<String, dynamic> json) {
-    return GiphyWebPImage(
-      url: json['url'],
-      width: json['width'],
-      height: json['height'],
-      size: json['size'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'url': url,
-      'width': width,
-      'height': height,
-      'size': size
-    };
-  }
-
-  @override
-  String toString() {
-    return 'GiphyWebPImage{url: $url, width: $width, height: $height, size: $size}';
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GiphyWebPImage &&
-          runtimeType == other.runtimeType &&
-          url == other.url &&
-          width == other.width &&
-          height == other.height &&
-          size == other.size;
-
-  @override
-  int get hashCode =>
-      url.hashCode ^ width.hashCode ^ height.hashCode ^ size.hashCode;
+  /// Creates a new .WEBP image from [json]
+  factory GiphyWebPImage.fromJson(Map<String, dynamic> json) => GiphyWebPImage(
+        url: json['url'],
+        width: json['width'],
+        height: json['height'],
+        size: json['size'],
+      );
 }

@@ -24,7 +24,7 @@ class FakeGiphyClient extends Fake implements GiphyClient {
     String lang = GiphyLanguage.english,
     GiphyType type = GiphyType.gifs,
   }) {
-    final body = trendingBody;
+    const body = trendingBody;
 
     final decoded =
         GiphyCollection.fromJson(json.decode(body) as Map<String, dynamic>);
@@ -40,7 +40,7 @@ class FakeGiphyClient extends Fake implements GiphyClient {
     String lang = GiphyLanguage.english,
     GiphyType type = GiphyType.gifs,
   }) {
-    final body = searchBody;
+    const body = searchBody;
 
     final decoded =
         GiphyCollection.fromJson(json.decode(body) as Map<String, dynamic>);
@@ -54,7 +54,7 @@ class FakeGiphyClient extends Fake implements GiphyClient {
     GiphyRating rating = GiphyRating.g,
     String lang = GiphyLanguage.english,
   }) {
-    final body = emojiBody;
+    const body = emojiBody;
 
     final decoded =
         GiphyCollection.fromJson(json.decode(body) as Map<String, dynamic>);

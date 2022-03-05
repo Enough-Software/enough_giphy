@@ -1,3 +1,8 @@
+// ignore_for_file: lines_longer_than_80_chars
+// cSpell:disable
+
+import 'dart:convert';
+
 import 'package:enough_giphy/enough_giphy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'fake.dart';
@@ -71,7 +76,7 @@ void main() {
 
       final gif = await client.random(tag: '');
 
-      expect(gif, TypeMatcher<GiphyGif>());
+      expect(gif, const TypeMatcher<GiphyGif>());
       expect(gif.title, 'drunk bbc two GIF by BBC');
     });
 
@@ -80,7 +85,7 @@ void main() {
 
       final gif = await client.byId('l46Cc0Ped9R0uiTkY');
 
-      expect(gif, TypeMatcher<GiphyGif>());
+      expect(gif, const TypeMatcher<GiphyGif>());
       expect(gif.title, 'beyonce freedom GIF by BET Awards');
     });
 
@@ -97,7 +102,6 @@ void main() {
         gif.url,
         'https://giphy.com/gifs/adweek-water-cary-elwes-l49JIgBhX4X6hyCGY',
       );
-      expect(gif.bitlyGifUrl, 'https://gph.is/2EVgGCt');
       expect(gif.bitlyUrl, 'https://gph.is/2EVgGCt');
       expect(gif.embedUrl, 'https://giphy.com/embed/l49JIgBhX4X6hyCGY');
       expect(gif.username, 'adweek');
@@ -106,8 +110,8 @@ void main() {
       expect(gif.contentUrl, '');
       expect(gif.sourceTld, '');
       expect(gif.sourcePostUrl, '');
-      expect(gif.importDatetime, DateTime.parse('2018-01-04 18:58:22'));
-      expect(gif.trendingDatetime, DateTime.parse('2018-04-27 23:15:01'));
+      expect(gif.importDateTime, DateTime.parse('2018-01-04 18:58:22'));
+      expect(gif.trendingDateTime, DateTime.parse('2018-04-27 23:15:01'));
       expect(gif.title, 'cary elwes water GIF by ADWEEK');
     });
 
@@ -146,31 +150,41 @@ void main() {
 
       // Gif Validation
       final images = (await client.trendingCollection()).data.first.images;
-      expect(images.fixedHeightStill, TypeMatcher<GiphyStillImage>());
-      expect(images.originalStill, TypeMatcher<GiphyStillImage>());
+      expect(images.fixedHeightStill, const TypeMatcher<GiphyStillImage>());
+      expect(images.originalStill, const TypeMatcher<GiphyStillImage>());
       // expect(images.fixedWidth, GiphyFullImage());
-      expect(images.fixedHeightSmallStill, TypeMatcher<GiphyStillImage>());
+      expect(
+          images.fixedHeightSmallStill, const TypeMatcher<GiphyStillImage>());
       // expect(
       //   images.fixedHeightDownsampled,
       //   GiphyDownsampledImage(),
       // );
-      expect(images.preview, TypeMatcher<GiphyPreviewImage>());
-      expect(images.fixedHeightSmall, TypeMatcher<GiphyFullImage>());
-      expect(images.downsizedStill, TypeMatcher<GiphyStillImage>());
-      expect(images.downsized, TypeMatcher<GiphyDownsizedImage>());
-      expect(images.downsizedLarge, TypeMatcher<GiphyDownsizedImage>());
-      expect(images.fixedWidthSmallStill, TypeMatcher<GiphyStillImage>());
-      expect(images.previewWebp, TypeMatcher<GiphyWebPImage>());
-      expect(images.fixedWidthStill, TypeMatcher<GiphyStillImage>());
-      expect(images.fixedWidthSmall, TypeMatcher<GiphyFullImage>());
-      expect(images.downsizedSmall, TypeMatcher<GiphyPreviewImage>());
-      expect(images.downsizedMedium, TypeMatcher<GiphyPreviewImage>());
-      expect(images.original, TypeMatcher<GiphyOriginalImage>());
-      expect(images.fixedHeight, TypeMatcher<GiphyFullImage>());
-      expect(images.looping, TypeMatcher<GiphyLoopingImage>());
-      expect(images.originalMp4, TypeMatcher<GiphyPreviewImage>());
-      expect(images.previewGif, TypeMatcher<GiphyDownsizedImage>());
-      expect(images.w480Still, TypeMatcher<GiphyStillImage>());
+      expect(images.preview, const TypeMatcher<GiphyPreviewImage>());
+      expect(images.fixedHeightSmall, const TypeMatcher<GiphyFullImage>());
+      expect(images.downsizedStill, const TypeMatcher<GiphyStillImage>());
+      expect(images.downsized, const TypeMatcher<GiphyDownSizedImage>());
+      expect(images.downsizedLarge, const TypeMatcher<GiphyDownSizedImage>());
+      expect(images.fixedWidthSmallStill, const TypeMatcher<GiphyStillImage>());
+      expect(images.previewWebp, const TypeMatcher<GiphyWebPImage>());
+      expect(images.fixedWidthStill, const TypeMatcher<GiphyStillImage>());
+      expect(images.fixedWidthSmall, const TypeMatcher<GiphyFullImage>());
+      expect(images.downsizedSmall, const TypeMatcher<GiphyPreviewImage>());
+      expect(images.downsizedMedium, const TypeMatcher<GiphyPreviewImage>());
+      expect(images.original, const TypeMatcher<GiphyOriginalImage>());
+      expect(images.fixedHeight, const TypeMatcher<GiphyFullImage>());
+      expect(images.looping, const TypeMatcher<GiphyLoopingImage>());
+      expect(images.originalMp4, const TypeMatcher<GiphyPreviewImage>());
+      expect(images.previewGif, const TypeMatcher<GiphyDownSizedImage>());
+      expect(images.w480Still, const TypeMatcher<GiphyStillImage>());
+    });
+
+    test('emoji pagination accepted', () {
+      const json = '{"count":30,"offset":0,"next_cursor":30}';
+      final pagination = GiphyPagination.fromJson(jsonDecode(json));
+      expect(pagination.count, 30);
+      expect(pagination.offset, 0);
+      expect(pagination.nextCursor, 30);
+      expect(pagination.totalCount, null);
     });
   });
 }

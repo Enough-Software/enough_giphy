@@ -1,3 +1,4 @@
+/// MPAA compatible rating
 enum GiphyRating {
   /// level 1 - General Audience
   ///
@@ -18,20 +19,4 @@ enum GiphyRating {
   ///
   /// Children Under 17 Require Accompanying Parent or Adult Guardian.
   r,
-}
-
-extension ExtensionGiphyRating on GiphyRating {
-  /// Retrieves the parameter name for the given content rating
-  String get name {
-    switch (this) {
-      case GiphyRating.g:
-        return 'g';
-      case GiphyRating.pg:
-        return 'pg';
-      case GiphyRating.pg13:
-        return 'pg13';
-      case GiphyRating.r:
-        return 'r';
-    }
-  }
 }

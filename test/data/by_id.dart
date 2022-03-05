@@ -1,3 +1,4 @@
+// cSpell:disable
 const byIdBody = '''{
     "data": {
         "type": "gif",
