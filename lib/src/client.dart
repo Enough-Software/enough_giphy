@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+
 import 'models/models.dart';
 
 /// A client for GIPHY
@@ -414,8 +415,11 @@ class GiphySource {
     }
     if (!hasElementAt(index)) {
       final total = nextCursor != null ? nextCursor : totalCount;
-      throw IndexError(index, null, null,
-          'Invalid index $index in source with total $total', total);
+      throw IndexError.withLength(
+        index,
+        _cache.length,
+        message: 'Invalid index $index in source with total $total',
+      );
     }
     final page = index ~/ _pageLength;
     var pageRequest = _requestedPages[page];

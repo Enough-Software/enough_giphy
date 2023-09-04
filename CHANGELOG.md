@@ -1,3 +1,6 @@
+## 0.2.1
+- Update dependencies
+
 ## 0.2.0
 * Adapt to emoji API changes
 * Improve documentation and code style
